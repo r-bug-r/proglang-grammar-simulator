@@ -1,16 +1,27 @@
-# Formal Grammars & CFG Simulation Lab
+# Formal Grammars & CFG Simulation Lab & Obsidian Reviewer Center
 > **UST-CICS CS311 Programming Languages &bull; Prof. Bernard C. Fabro, PCpE**
 
-A minimalist, interactive step-by-step simulator and forensic practice lab for mastering **formal grammars, derivations, context-free grammars (CFGs), and combinatorial sentence sizing**.
+A minimalist, scholarly learning application, interactive CFG simulator, and portable Obsidian-inspired reviewing vault designed for mastering **formal grammars, derivations, context-free grammars (CFGs), and combinatorial language sizing**.
+
+---
+
+## 🎨 Architectural Design & User Experience
+
+- **Scholarly White Learning Theme**: Crisp white paper aesthetic (`#ffffff`) with deep slate typography (`#0f172a`), refined academic accents, and high readability inspired by editorial reading tools (with built-in dark theme toggle).
+- **Sharp Minimalist Geometry**: 0px border radius across all cards, buttons, callouts, and pills—eliminating bubbly containers for a disciplined, Swiss-style architectural look.
+- **Borderless Flat Containers**: Clean surface separation and hairline dividers without heavy, boxy container outlines.
+- **Poco X8 Pro Max Responsive Architecture**: Optimized for tall ~20:9 mobile aspect ratios (1220x2712 / 1080x2400) with safe area insets, touch-friendly 44px+ tap targets, swipeable navigation tabs, and a slide-out drawer for browsing the reviewer vault.
 
 ---
 
 ## 🔬 Core Learning Modules
 
 ### 0. Obsidian Reviewer Vault (Portable Reviewing Center)
-- Dedicated Obsidian-inspired Markdown viewer and study center with dark vault styling.
+- Dedicated Obsidian-inspired Markdown viewer and portable study center with full light/dark theme support.
 - Bundles all **7 core academic reviewers & study guides** directly inside the repository (`/reviewers/`).
-- **Active Recall Cloze Toggle**: Switch between **Study Mode** (cloze blanks blurred with click-to-reveal interaction) and **Reading Mode** (all answers highlighted).
+- **Active Recall Cloze Toggle**: Switch between **Study Mode** (cloze blanks hidden with click/tap-to-reveal interaction) and **Reading Mode** (all answers revealed).
+- **Mobile Off-Canvas Drawer**: On smartphones (such as Poco X8 Pro Max), an off-canvas drawer allows instant document switching with one thumb while preserving 100% full-width reading immersion.
+- **Chapter Bottom Navigation**: Seamlessly navigate `← Previous Reviewer` and `Next Reviewer →` directly at the foot of each document.
 - **Vault File Explorer**: Real-time search filter across all documents with word counts, read times, and YAML frontmatter metadata cards.
 - **Obsidian Callouts & Wikilinks**: Full visual support for `> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]`, and clickable `[[DocName]]` links.
 - **Import Local Files**: Easily load any external `.md` notes from your computer on the fly.

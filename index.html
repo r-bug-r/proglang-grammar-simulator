@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Formal Grammars & CFG Step-by-Step Simulator | UST CS311</title>
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,9 +18,13 @@
         <p class="subtitle">Interactive step-by-step simulator for assignment derivations, parentheses generation, declarations, and combinatorial sizing proofs.</p>
       </div>
       <div class="header-controls">
+        <button class="theme-toggle-btn" id="btn-theme-toggle" title="Toggle Light / Dark Theme" aria-label="Toggle Theme">
+          <span class="theme-icon" id="theme-toggle-icon">&#127769;</span>
+          <span class="theme-label" id="theme-toggle-label">Dark</span>
+        </button>
         <a href="https://github.com/r-bug-r/proglang-grammar-simulator" target="_blank" class="github-link" id="github-repo-link">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-          GitHub Repository
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+          <span>GitHub</span>
         </a>
       </div>
     </div>
@@ -58,17 +62,23 @@
     
     <!-- TAB 0: OBSIDIAN REVIEWER VAULT -->
     <section class="tab-pane active" id="pane-obsidian-vault">
+      <!-- Backdrop for mobile drawer -->
+      <div class="vault-backdrop" id="vault-backdrop"></div>
+
       <div class="obsidian-app-container">
         
         <!-- Left Sidebar: Obsidian Vault Explorer -->
-        <aside class="obsidian-sidebar">
+        <aside class="obsidian-sidebar" id="obsidian-sidebar">
           <div class="vault-header">
             <div class="vault-title-row">
-              <span class="vault-icon">&#128194;</span>
-              <div>
-                <div class="vault-name">PROGLANG VAULT</div>
-                <div class="vault-meta">UST-CICS &bull; Reviewer Center</div>
+              <div class="vault-brand">
+                <span class="vault-icon">&#128194;</span>
+                <div>
+                  <div class="vault-name">PROGLANG VAULT</div>
+                  <div class="vault-meta">UST-CICS &bull; Reviewer Center</div>
+                </div>
               </div>
+              <button class="btn-close-drawer" id="btn-close-vault-drawer" aria-label="Close file explorer">&times;</button>
             </div>
             <div class="vault-search-box">
               <input type="text" id="vault-filter-input" placeholder="Filter files in vault...">
@@ -94,6 +104,12 @@
         <div class="obsidian-main-editor">
           <!-- Document Header Bar -->
           <div class="doc-header-bar">
+            <!-- Mobile Drawer Button (visible on mobile / Poco X8 Pro Max) -->
+            <button class="mobile-drawer-btn" id="btn-open-vault-drawer" aria-label="Browse Reviewer Files">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+              <span>Files (<span id="mobile-file-count">7</span>)</span>
+            </button>
+
             <div class="doc-breadcrumb">
               <span class="folder-crumb">reviewers</span>
               <span class="crumb-separator">/</span>
@@ -126,6 +142,12 @@
           <div class="obsidian-reading-canvas">
             <div class="obsidian-markdown-body" id="obsidian-rendered-view">
               <!-- Rendered Markdown goes here -->
+            </div>
+
+            <!-- Chapter Navigation at Bottom of Document -->
+            <div class="doc-bottom-nav">
+              <button class="btn-doc-nav" id="btn-prev-doc">&larr; Previous Document</button>
+              <button class="btn-doc-nav" id="btn-next-doc">Next Document &rarr;</button>
             </div>
           </div>
         </div>

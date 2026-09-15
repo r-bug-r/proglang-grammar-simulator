@@ -2,6 +2,7 @@
 // Designed for UST-CICS CS311 Programming Languages
 
 document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
   initTabs();
   initObsidianViewer();
   initDerivationStepper();
@@ -10,6 +11,39 @@ document.addEventListener('DOMContentLoaded', () => {
   initCombinatoricsCalculator();
   initPracticeQuiz();
 });
+
+// ==========================================
+// 0. THEME SWITCHER (Default: White/Light)
+// ==========================================
+function initTheme() {
+  const savedTheme = localStorage.getItem('proglang_theme') || 'light';
+  applyTheme(savedTheme);
+
+  const toggleBtn = document.getElementById('btn-theme-toggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const nextTheme = current === 'dark' ? 'light' : 'dark';
+      applyTheme(nextTheme);
+      localStorage.setItem('proglang_theme', nextTheme);
+    });
+  }
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const icon = document.getElementById('theme-toggle-icon');
+  const label = document.getElementById('theme-toggle-label');
+  if (icon && label) {
+    if (theme === 'dark') {
+      icon.innerHTML = '&#9728;&#65039;';
+      label.textContent = 'Light';
+    } else {
+      icon.innerHTML = '&#127769;';
+      label.textContent = 'Dark';
+    }
+  }
+}
 
 // ==========================================
 // 1. TAB NAVIGATION
@@ -1038,8 +1072,34 @@ function initObsidianViewer() {
   const clozeText = document.getElementById('cloze-toggle-text');
   const btnCopyDoc = document.getElementById('btn-copy-doc');
   const fileUpload = document.getElementById('custom-file-upload');
+  
+  // Mobile Drawer Elements
+  const openDrawerBtn = document.getElementById('btn-open-vault-drawer');
+  const closeDrawerBtn = document.getElementById('btn-close-vault-drawer');
+  const backdrop = document.getElementById('vault-backdrop');
+  const sidebar = document.getElementById('obsidian-sidebar');
+  const prevDocBtn = document.getElementById('btn-prev-doc');
+  const nextDocBtn = document.getElementById('btn-next-doc');
+
+  function openVaultDrawer() {
+    if (sidebar) sidebar.classList.add('drawer-open');
+    if (backdrop) backdrop.classList.add('active');
+  }
+
+  function closeVaultDrawer() {
+    if (sidebar) sidebar.classList.remove('drawer-open');
+    if (backdrop) backdrop.classList.remove('active');
+  }
+
+  if (openDrawerBtn) openDrawerBtn.addEventListener('click', openVaultDrawer);
+  if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeVaultDrawer);
+  if (backdrop) backdrop.addEventListener('click', closeVaultDrawer);
 
   const filesData = window.REVIEWERS_DATA || {};
+
+  // Update mobile file counter badge
+  const mobileCountElem = document.getElementById('mobile-file-count');
+  if (mobileCountElem) mobileCountElem.textContent = Object.keys(filesData).length;
 
   renderVaultTree(filesData);
 
@@ -1069,7 +1129,7 @@ function initObsidianViewer() {
       if (doc) {
         navigator.clipboard.writeText(doc.content);
         const originalSvg = btnCopyDoc.innerHTML;
-        btnCopyDoc.innerHTML = '<span style="font-size:0.75rem; color:#56d364; font-weight:700;">Copied!</span>';
+        btnCopyDoc.innerHTML = '<span style="font-size:0.75rem; color:#16a34a; font-weight:700;">Copied!</span>';
         setTimeout(() => { btnCopyDoc.innerHTML = originalSvg; }, 1500);
       }
     });
@@ -1092,6 +1152,7 @@ function initObsidianViewer() {
             content: content
           };
           activeDocumentKey = customKey;
+          if (mobileCountElem) mobileCountElem.textContent = Object.keys(filesData).length;
           renderVaultTree(filesData);
           renderActiveDocument(filesData);
         };
@@ -1100,8 +1161,36 @@ function initObsidianViewer() {
     });
   }
 
+  // Chapter Next / Prev Navigation
+  if (prevDocBtn) {
+    prevDocBtn.addEventListener('click', () => {
+      navigateDocument(-1, filesData);
+    });
+  }
+
+  if (nextDocBtn) {
+    nextDocBtn.addEventListener('click', () => {
+      navigateDocument(1, filesData);
+    });
+  }
+
   // Render initial active doc
   renderActiveDocument(filesData);
+}
+
+function navigateDocument(direction, filesData) {
+  const keys = Object.keys(filesData);
+  const curIdx = keys.indexOf(activeDocumentKey);
+  if (curIdx === -1) return;
+
+  const newIdx = curIdx + direction;
+  if (newIdx >= 0 && newIdx < keys.length) {
+    activeDocumentKey = keys[newIdx];
+    renderVaultTree(filesData);
+    renderActiveDocument(filesData);
+    const canvas = document.querySelector('.obsidian-reading-canvas');
+    if (canvas) canvas.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 }
 
 function renderVaultTree(filesData, filter = '') {
@@ -1143,7 +1232,7 @@ function renderVaultTree(filesData, filter = '') {
 
     const catTitle = document.createElement('div');
     catTitle.className = 'vault-category-title';
-    catTitle.innerHTML = `<span style="color:#7b68ee;">&#128193;</span> ${catName}`;
+    catTitle.innerHTML = `<span style="color:var(--accent-blue);">&#128193;</span> ${catName}`;
     catGroup.appendChild(catTitle);
 
     categories[catName].forEach(file => {
@@ -1166,6 +1255,14 @@ function renderVaultTree(filesData, filter = '') {
         document.querySelectorAll('.vault-file-item').forEach(el => el.classList.remove('active'));
         item.classList.add('active');
         renderActiveDocument(filesData);
+
+        // Auto-close drawer on mobile devices (e.g. Poco X8 Pro Max)
+        if (window.innerWidth <= 860) {
+          const sidebar = document.getElementById('obsidian-sidebar');
+          const backdrop = document.getElementById('vault-backdrop');
+          if (sidebar) sidebar.classList.remove('drawer-open');
+          if (backdrop) backdrop.classList.remove('active');
+        }
       });
 
       catGroup.appendChild(item);
@@ -1213,6 +1310,34 @@ function renderActiveDocument(filesData) {
       });
     });
   }
+
+  // Update Bottom Navigation Buttons
+  const keys = Object.keys(filesData);
+  const curIdx = keys.indexOf(activeDocumentKey);
+  const prevDocBtn = document.getElementById('btn-prev-doc');
+  const nextDocBtn = document.getElementById('btn-next-doc');
+
+  if (prevDocBtn) {
+    if (curIdx > 0) {
+      prevDocBtn.style.visibility = 'visible';
+      const prevKey = keys[curIdx - 1];
+      const prevTitle = filesData[prevKey].title || prevKey;
+      prevDocBtn.innerHTML = `&larr; Previous: ${prevTitle.slice(0, 24)}${prevTitle.length > 24 ? '...' : ''}`;
+    } else {
+      prevDocBtn.style.visibility = 'hidden';
+    }
+  }
+
+  if (nextDocBtn) {
+    if (curIdx < keys.length - 1) {
+      nextDocBtn.style.visibility = 'visible';
+      const nextKey = keys[curIdx + 1];
+      const nextTitle = filesData[nextKey].title || nextKey;
+      nextDocBtn.innerHTML = `Next: ${nextTitle.slice(0, 24)}${nextTitle.length > 24 ? '...' : ''} &rarr;`;
+    } else {
+      nextDocBtn.style.visibility = 'hidden';
+    }
+  }
 }
 
 function formatBytes(bytes) {
@@ -1221,4 +1346,5 @@ function formatBytes(bytes) {
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
   return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 }
+
 
