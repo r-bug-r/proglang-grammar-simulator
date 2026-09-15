@@ -27,7 +27,11 @@
 
     <!-- Navigation Tabs -->
     <nav class="nav-tabs" role="tablist">
-      <button class="tab-btn active" data-tab="derivation" id="tab-btn-derivation">
+      <button class="tab-btn active" data-tab="obsidian-vault" id="tab-btn-obsidian-vault">
+        <span class="tab-num">&#128194;</span>
+        Obsidian Reviewer Vault
+      </button>
+      <button class="tab-btn" data-tab="derivation" id="tab-btn-derivation">
         <span class="tab-num">01</span>
         Assignment Derivation
       </button>
@@ -52,8 +56,85 @@
 
   <main class="main-container">
     
+    <!-- TAB 0: OBSIDIAN REVIEWER VAULT -->
+    <section class="tab-pane active" id="pane-obsidian-vault">
+      <div class="obsidian-app-container">
+        
+        <!-- Left Sidebar: Obsidian Vault Explorer -->
+        <aside class="obsidian-sidebar">
+          <div class="vault-header">
+            <div class="vault-title-row">
+              <span class="vault-icon">&#128194;</span>
+              <div>
+                <div class="vault-name">PROGLANG VAULT</div>
+                <div class="vault-meta">UST-CICS &bull; Reviewer Center</div>
+              </div>
+            </div>
+            <div class="vault-search-box">
+              <input type="text" id="vault-filter-input" placeholder="Filter files in vault...">
+            </div>
+          </div>
+
+          <!-- File Tree -->
+          <div class="vault-file-tree" id="vault-file-tree">
+            <!-- Populated via JS with categories and files -->
+          </div>
+
+          <!-- Vault Footer Actions -->
+          <div class="vault-footer">
+            <label class="btn-vault-action" for="custom-file-upload">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              Open External .md
+            </label>
+            <input type="file" id="custom-file-upload" accept=".md,.txt" style="display:none">
+          </div>
+        </aside>
+
+        <!-- Right Main: Obsidian Document Viewer -->
+        <div class="obsidian-main-editor">
+          <!-- Document Header Bar -->
+          <div class="doc-header-bar">
+            <div class="doc-breadcrumb">
+              <span class="folder-crumb">reviewers</span>
+              <span class="crumb-separator">/</span>
+              <span class="active-filename" id="doc-active-title">ProgLang_Top5_HighYield_Exam_Mastery.md</span>
+            </div>
+            
+            <div class="doc-controls">
+              <div class="doc-stats">
+                <span id="doc-word-count">0 words</span>
+                <span class="bullet-dot">&bull;</span>
+                <span id="doc-read-time">0 min read</span>
+              </div>
+              
+              <!-- Study Mode Toggle -->
+              <div class="study-mode-switch">
+                <label class="switch-label">
+                  <input type="checkbox" id="cloze-toggle" checked>
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-text" id="cloze-toggle-text">Study Mode (Cloze Active)</span>
+                </label>
+              </div>
+
+              <button class="btn-icon" id="btn-copy-doc" title="Copy Full Markdown">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Document Render Surface -->
+          <div class="obsidian-reading-canvas">
+            <div class="obsidian-markdown-body" id="obsidian-rendered-view">
+              <!-- Rendered Markdown goes here -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
     <!-- TAB 1: ASSIGNMENT DERIVATION -->
-    <section class="tab-pane active" id="pane-derivation">
+    <section class="tab-pane" id="pane-derivation">
       <div class="panel-layout">
         
         <!-- Left: Controls & Simulation Canvas -->
@@ -472,6 +553,8 @@
     </div>
   </footer>
 
+  <script src="reviewers_data.js"></script>
+  <script src="markdown_engine.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

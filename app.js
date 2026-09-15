@@ -3,6 +3,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   initTabs();
+  initObsidianViewer();
   initDerivationStepper();
   initParenthesesSimulator();
   initDeclarationsValidator();
@@ -1021,3 +1022,203 @@ function initPracticeQuiz() {
     container.appendChild(card);
   });
 }
+
+// ==========================================
+// 7. OBSIDIAN REVIEWER VAULT LOGIC
+// ==========================================
+let activeDocumentKey = 'ProgLang_Top5_HighYield_Exam_Mastery.md';
+let markdownEngineInstance = null;
+
+function initObsidianViewer() {
+  if (!window.ObsidianMarkdownEngine) return;
+  markdownEngineInstance = new window.ObsidianMarkdownEngine();
+
+  const filterInput = document.getElementById('vault-filter-input');
+  const clozeToggle = document.getElementById('cloze-toggle');
+  const clozeText = document.getElementById('cloze-toggle-text');
+  const btnCopyDoc = document.getElementById('btn-copy-doc');
+  const fileUpload = document.getElementById('custom-file-upload');
+
+  const filesData = window.REVIEWERS_DATA || {};
+
+  renderVaultTree(filesData);
+
+  // Search filter
+  if (filterInput) {
+    filterInput.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      renderVaultTree(filesData, q);
+    });
+  }
+
+  // Cloze Mode Toggle
+  if (clozeToggle) {
+    clozeToggle.addEventListener('change', (e) => {
+      markdownEngineInstance.setStudyMode(e.target.checked);
+      if (clozeText) {
+        clozeText.textContent = e.target.checked ? 'Study Mode (Cloze Active)' : 'Reading Mode (All Revealed)';
+      }
+      renderActiveDocument(filesData);
+    });
+  }
+
+  // Copy Document Button
+  if (btnCopyDoc) {
+    btnCopyDoc.addEventListener('click', () => {
+      const doc = filesData[activeDocumentKey];
+      if (doc) {
+        navigator.clipboard.writeText(doc.content);
+        const originalSvg = btnCopyDoc.innerHTML;
+        btnCopyDoc.innerHTML = '<span style="font-size:0.75rem; color:#56d364; font-weight:700;">Copied!</span>';
+        setTimeout(() => { btnCopyDoc.innerHTML = originalSvg; }, 1500);
+      }
+    });
+  }
+
+  // Custom File Upload
+  if (fileUpload) {
+    fileUpload.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const content = event.target.result;
+          const customKey = file.name;
+          filesData[customKey] = {
+            filename: file.name,
+            title: file.name.replace(/\.md$|\.txt$/, ''),
+            category: 'Imported Files',
+            sizeBytes: file.size,
+            content: content
+          };
+          activeDocumentKey = customKey;
+          renderVaultTree(filesData);
+          renderActiveDocument(filesData);
+        };
+        reader.readAsText(file);
+      }
+    });
+  }
+
+  // Render initial active doc
+  renderActiveDocument(filesData);
+}
+
+function renderVaultTree(filesData, filter = '') {
+  const vaultTree = document.getElementById('vault-file-tree');
+  if (!vaultTree) return;
+  vaultTree.innerHTML = '';
+
+  const categories = {};
+  Object.keys(filesData).forEach(key => {
+    const file = filesData[key];
+    if (filter && !file.filename.toLowerCase().includes(filter) && !file.title.toLowerCase().includes(filter)) {
+      return;
+    }
+    const cat = file.category || 'General Reviewers';
+    if (!categories[cat]) categories[cat] = [];
+    categories[cat].push(file);
+  });
+
+  const categoryOrder = [
+    'Simulations & High-Yield',
+    'Master Reviewers',
+    'Quizzes & Answer Keys',
+    'Study Protocols',
+    'Imported Files'
+  ];
+
+  const sortedCatNames = Object.keys(categories).sort((a, b) => {
+    const idxA = categoryOrder.indexOf(a);
+    const idxB = categoryOrder.indexOf(b);
+    if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+    if (idxA !== -1) return -1;
+    if (idxB !== -1) return 1;
+    return a.localeCompare(b);
+  });
+
+  sortedCatNames.forEach(catName => {
+    const catGroup = document.createElement('div');
+    catGroup.className = 'vault-category';
+
+    const catTitle = document.createElement('div');
+    catTitle.className = 'vault-category-title';
+    catTitle.innerHTML = `<span style="color:#7b68ee;">&#128193;</span> ${catName}`;
+    catGroup.appendChild(catTitle);
+
+    categories[catName].forEach(file => {
+      const item = document.createElement('div');
+      item.className = `vault-file-item ${file.filename === activeDocumentKey ? 'active' : ''}`;
+      
+      const left = document.createElement('div');
+      left.className = 'file-item-left';
+      left.innerHTML = `<span class="file-item-icon">&#9632;</span> <span title="${file.filename}">${file.title || file.filename}</span>`;
+
+      const size = document.createElement('span');
+      size.className = 'file-item-size';
+      size.textContent = formatBytes(file.sizeBytes);
+
+      item.appendChild(left);
+      item.appendChild(size);
+
+      item.addEventListener('click', () => {
+        activeDocumentKey = file.filename;
+        document.querySelectorAll('.vault-file-item').forEach(el => el.classList.remove('active'));
+        item.classList.add('active');
+        renderActiveDocument(filesData);
+      });
+
+      catGroup.appendChild(item);
+    });
+
+    vaultTree.appendChild(catGroup);
+  });
+}
+
+function renderActiveDocument(filesData) {
+  const doc = filesData[activeDocumentKey];
+  if (!doc) return;
+
+  const titleElem = document.getElementById('doc-active-title');
+  if (titleElem) titleElem.textContent = doc.filename;
+
+  // Stats
+  const words = doc.content.split(/\s+/).filter(Boolean).length;
+  const wordElem = document.getElementById('doc-word-count');
+  if (wordElem) wordElem.textContent = `${words.toLocaleString()} words`;
+  const readTime = Math.ceil(words / 200);
+  const readElem = document.getElementById('doc-read-time');
+  if (readElem) readElem.textContent = `${readTime} min read`;
+
+  // Render markdown
+  const viewContainer = document.getElementById('obsidian-rendered-view');
+  if (viewContainer && markdownEngineInstance) {
+    viewContainer.innerHTML = markdownEngineInstance.render(doc.content);
+
+    // Wire up wikilinks [[Target]]
+    viewContainer.querySelectorAll('.obsidian-wikilink').forEach(link => {
+      link.addEventListener('click', () => {
+        const target = link.getAttribute('data-wikilink');
+        const foundKey = Object.keys(filesData).find(k => 
+          k.toLowerCase().includes(target.toLowerCase()) || 
+          filesData[k].title.toLowerCase().includes(target.toLowerCase())
+        );
+        if (foundKey) {
+          activeDocumentKey = foundKey;
+          renderVaultTree(filesData);
+          renderActiveDocument(filesData);
+          const canvas = document.querySelector('.obsidian-reading-canvas');
+          if (canvas) canvas.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+    });
+  }
+}
+
+function formatBytes(bytes) {
+  if (!bytes) return '0 B';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+

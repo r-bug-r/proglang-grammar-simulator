@@ -1,0 +1,62 @@
+PART I - MULTIPLE CHOICE
+1. B. Name
+2. C. Address
+3. A. r-value
+4. B. Binding
+5. B. Compile-time binding
+6. B. Dynamic binding
+7. C. At run time
+8. A. Python
+9. B. Scope
+10. C. Local variable
+11. B. Program structure
+12. C. Calling sequence
+13. B. Lifetime
+14. C. Named constant
+15. B. final
+
+PART II - IDENTIFICATION
+1. Binding
+2. Binding time
+3. Address
+4. Value
+5. Scope
+6. Lifetime
+7. Global variable
+8. Local variable
+9. Static scope
+10. Dynamic scope
+
+PART III - ANALYZE THE CODE
+1.
+x: Global variable
+y: Local variable
+Explanation: x is declared outside all functions; y is declared inside test().
+2.
+Answer: 80
+Explanation: Local score inside display() hides the global score.
+3.
+Answer: It is bound to a value only once using final and cannot be changed.
+4.
+Scope of count: Local scope
+Lifetime of count: Entire program execution
+5.
+Name: age
+Type: int
+Initial Value: 20
+Binding: Compile-time type binding (age is bound to type int at compile time).
+
+PART IV - STATIC VS. DYNAMIC SCOPE
+1. 3
+2. 7
+3. Static scope follows program structure where big encloses sub2 (x = 3). Dynamic scope follows calling sequence where sub1 called sub2 (x = 7).
+
+PART V - SUMMATIVE APPLICATION
+1.
+school: Global variable
+course: Nonlocal variable
+year: Local variable
+2. school, course, year
+3. No. year is local to student() and cannot be accessed outside its function.
+4. Local course inside student() hides course in department().
+5. Clear scope rules protect data by limiting where code can change a variable. Keeping variables local stops one function from silently breaking another. Early type binding lets compilers catch errors before execution. This prevents crashes and makes testing easier. Good design ensures data exists only where needed.

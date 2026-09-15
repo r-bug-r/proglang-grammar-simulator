@@ -7,6 +7,14 @@ A minimalist, interactive step-by-step simulator and forensic practice lab for m
 
 ## 🔬 Core Learning Modules
 
+### 0. Obsidian Reviewer Vault (Portable Reviewing Center)
+- Dedicated Obsidian-inspired Markdown viewer and study center with dark vault styling.
+- Bundles all **7 core academic reviewers & study guides** directly inside the repository (`/reviewers/`).
+- **Active Recall Cloze Toggle**: Switch between **Study Mode** (cloze blanks blurred with click-to-reveal interaction) and **Reading Mode** (all answers highlighted).
+- **Vault File Explorer**: Real-time search filter across all documents with word counts, read times, and YAML frontmatter metadata cards.
+- **Obsidian Callouts & Wikilinks**: Full visual support for `> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]`, and clickable `[[DocName]]` links.
+- **Import Local Files**: Easily load any external `.md` notes from your computer on the fly.
+
 ### 1. Leftmost Assignment Derivations: $A = B * (A + C)$
 - Step-by-step expansion tracking character counts, remaining non-terminals, and rule applications.
 - Previews "what comes next" using the strict leftmost derivation rule.
