@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formal Grammars & CFG Step-by-Step Simulator | UST CS311</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-content">
+      <div class="header-titles">
+        <span class="badge">UST CICS &bull; CS311 Programming Languages</span>
+        <h1>Formal Grammars & CFG Simulation Lab</h1>
+        <p class="subtitle">Interactive step-by-step simulator for assignment derivations, parentheses generation, declarations, and combinatorial sizing proofs.</p>
+      </div>
+      <div class="header-controls">
+        <a href="https://github.com/r-bug-r/proglang-grammar-simulator" target="_blank" class="github-link" id="github-repo-link">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+          GitHub Repository
+        </a>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" role="tablist">
+      <button class="tab-btn active" data-tab="derivation" id="tab-btn-derivation">
+        <span class="tab-num">01</span>
+        Assignment Derivation
+      </button>
+      <button class="tab-btn" data-tab="parentheses" id="tab-btn-parentheses">
+        <span class="tab-num">02</span>
+        Balanced Parentheses
+      </button>
+      <button class="tab-btn" data-tab="declarations" id="tab-btn-declarations">
+        <span class="tab-num">03</span>
+        C-Style Declarations
+      </button>
+      <button class="tab-btn" data-tab="combinatorics" id="tab-btn-combinatorics">
+        <span class="tab-num">04</span>
+        Combinatorial Sizing
+      </button>
+      <button class="tab-btn" data-tab="quiz" id="tab-btn-quiz">
+        <span class="tab-num">05</span>
+        Practice Quiz
+      </button>
+    </nav>
+  </header>
+
+  <main class="main-container">
+    
+    <!-- TAB 1: ASSIGNMENT DERIVATION -->
+    <section class="tab-pane active" id="pane-derivation">
+      <div class="panel-layout">
+        
+        <!-- Left: Controls & Simulation Canvas -->
+        <div class="panel-card main-simulation-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="section-tag">Interactive Leftmost Stepper</span>
+              <h2>Leftmost Derivation Step-by-Step</h2>
+            </div>
+            <div class="select-wrapper">
+              <label for="derivation-select">Target Expression:</label>
+              <select id="derivation-select">
+                <option value="slide_example" selected>A = B * (A + C) [Slide Example]</option>
+                <option value="variant_1">A = B + C * A [Similar Quiz Item 1]</option>
+                <option value="variant_2">A = (B + C) * A [Similar Quiz Item 2]</option>
+                <option value="simple">A = B + C [Simple Addition]</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Grammar Rules Display -->
+          <div class="grammar-box">
+            <span class="box-label">Production Rules in Grammar:</span>
+            <code>
+              &lt;assign&gt; &rarr; &lt;id&gt; = &lt;expr&gt;<br>
+              &lt;expr&gt; &rarr; &lt;id&gt; + &lt;expr&gt; | &lt;id&gt; * &lt;expr&gt; | ( &lt;expr&gt; ) | &lt;id&gt;<br>
+              &lt;id&gt; &rarr; A | B | C
+            </code>
+          </div>
+
+          <!-- Active String Display -->
+          <div class="display-stage">
+            <div class="stage-label">Current Sentential Form (String in Progress):</div>
+            <div class="current-string" id="derivation-string-display">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Stepper Controls -->
+          <div class="stepper-controls">
+            <button class="btn btn-secondary" id="btn-prev-step">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              Previous Step
+            </button>
+            <div class="step-indicator" id="step-counter">Step 0 of 9</div>
+            <button class="btn btn-primary" id="btn-next-step">
+              Next Step
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+            <button class="btn btn-ghost" id="btn-reset-step">Reset</button>
+          </div>
+
+          <!-- Metrics Bar -->
+          <div class="metrics-grid">
+            <div class="metric-item">
+              <span class="metric-title">Characters (no spaces)</span>
+              <span class="metric-value" id="metric-chars">8</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-title">Tokens</span>
+              <span class="metric-value" id="metric-tokens">1</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-title">Non-Terminals Left</span>
+              <span class="metric-value text-accent" id="metric-nonterminals">1</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-title">Terminals Locked</span>
+              <span class="metric-value text-success" id="metric-terminals">0</span>
+            </div>
+          </div>
+
+          <!-- Derivation History Timeline -->
+          <div class="history-container">
+            <h3>Derivation History</h3>
+            <ol class="history-list" id="derivation-history-list">
+              <!-- Filled via JS -->
+            </ol>
+          </div>
+        </div>
+
+        <!-- Right: Forensic Analysis & Glossary -->
+        <aside class="panel-card side-info-card">
+          <div class="info-block">
+            <h3>Active Step Diagnostics</h3>
+            <div class="status-pill" id="step-status-pill">In Progress</div>
+            <div class="diagnostic-row">
+              <span class="d-label">What Comes Next:</span>
+              <span class="d-val" id="diag-next-target">&lt;assign&gt;</span>
+            </div>
+            <div class="diagnostic-row">
+              <span class="d-label">Rule Applied:</span>
+              <span class="d-val" id="diag-rule-applied">Start Symbol</span>
+            </div>
+            <div class="diagnostic-row">
+              <span class="d-label">Leftmost Decision:</span>
+              <span class="d-val-text" id="diag-reason">The derivation must begin at the root statement.</span>
+            </div>
+          </div>
+
+          <div class="info-block">
+            <h3>Plain-English Jargon Glossary</h3>
+            <ul class="glossary-list">
+              <li><strong>Terminal:</strong> A final code character (e.g. <code>A</code>, <code>*</code>, <code>=</code>). Cannot be expanded.</li>
+              <li><strong>Non-Terminal:</strong> A placeholder in angle brackets <code>&lt;expr&gt;</code> that must be replaced.</li>
+              <li><strong>Leftmost Rule:</strong> Always replace the <em>very first placeholder on the left</em> before touching others.</li>
+              <li><strong>Sentential Form:</strong> The temporary mixed string at any single step.</li>
+            </ul>
+          </div>
+        </aside>
+
+      </div>
+    </section>
+
+    <!-- TAB 2: BALANCED PARENTHESES -->
+    <section class="tab-pane" id="pane-parentheses">
+      <div class="panel-layout">
+        <div class="panel-card main-simulation-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="section-tag">Interactive CFG Generator</span>
+              <h2>Balanced Parentheses Simulator: S &rarr; (S)S | &epsilon;</h2>
+            </div>
+          </div>
+
+          <div class="grammar-box">
+            <span class="box-label">Grammar Anatomy:</span>
+            <code>
+              S &rarr; ( S ) S | &epsilon;<br>
+              &bull; '(' and ')' are matching brackets.<br>
+              &bull; Inner S allows NESTING (parentheses inside).<br>
+              &bull; Outer S allows CHAINING (parentheses beside).<br>
+              &bull; &epsilon; (epsilon) is the STOP button (empty string "").
+            </code>
+          </div>
+
+          <!-- Presets -->
+          <div class="preset-buttons">
+            <span class="preset-label">Quick Patterns:</span>
+            <button class="btn btn-outline" id="btn-paren-preset-empty">Empty "" (&epsilon;)</button>
+            <button class="btn btn-outline" id="btn-paren-preset-single">Single ()</button>
+            <button class="btn btn-outline" id="btn-paren-preset-nested">Nested (())</button>
+            <button class="btn btn-outline" id="btn-paren-preset-chained">Chained ()()</button>
+            <button class="btn btn-outline" id="btn-paren-preset-complex">Complex (()())</button>
+          </div>
+
+          <!-- Interactive Generation Playground -->
+          <div class="display-stage">
+            <div class="stage-label">Current String Generated:</div>
+            <div class="current-string mono-large" id="paren-output-display">S</div>
+          </div>
+
+          <div class="stepper-controls">
+            <button class="btn btn-primary" id="btn-paren-nest">
+              Expand S &rarr; (S)S
+            </button>
+            <button class="btn btn-secondary" id="btn-paren-stop">
+              Close with &epsilon; (Stop)
+            </button>
+            <button class="btn btn-ghost" id="btn-paren-reset">Reset to S</button>
+          </div>
+
+          <div class="metrics-grid">
+            <div class="metric-item">
+              <span class="metric-title">Length</span>
+              <span class="metric-value" id="paren-length">1</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-title">Open Brackets</span>
+              <span class="metric-value" id="paren-open-count">0</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-title">Closed Brackets</span>
+              <span class="metric-value" id="paren-close-count">0</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-title">Validation</span>
+              <span class="metric-value text-success" id="paren-validity">Valid Prefix</span>
+            </div>
+          </div>
+
+          <!-- Derivation Trace -->
+          <div class="history-container">
+            <h3>Expansion Step Trace</h3>
+            <ol class="history-list" id="paren-history-list">
+              <li>Start symbol <code>S</code></li>
+            </ol>
+          </div>
+        </div>
+
+        <aside class="panel-card side-info-card">
+          <div class="info-block">
+            <h3>Why Parentheses Are Always Balanced</h3>
+            <p class="body-text">In this grammar, an opening bracket <code>(</code> can <strong>never</strong> be created alone. It is introduced only as part of the pair <code>( S )</code>.</p>
+            <p class="body-text">Because every single expansion introduces exactly one <code>(</code> and one <code>)</code> simultaneously, unbalanced strings like <code>)(</code> or <code>(()</code> are mathematically impossible.</p>
+          </div>
+
+          <div class="info-block">
+            <h3>Exam Practice Questions</h3>
+            <div class="exam-mini-q">
+              <strong>Q: Can S &rarr; (S)S | &epsilon; generate <code>)(</code>?</strong>
+              <p><em>No. The grammar strictly outputs <code>(</code> before <code>)</code>.</em></p>
+            </div>
+            <div class="exam-mini-q">
+              <strong>Q: What role does &epsilon; play?</strong>
+              <p><em>It serves as the base case that terminates recursion by erasing non-terminals.</em></p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- TAB 3: C-STYLE DECLARATIONS -->
+    <section class="tab-pane" id="pane-declarations">
+      <div class="panel-layout">
+        <div class="panel-card main-simulation-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="section-tag">Interactive Syntax Validator</span>
+              <h2>C-Style Declarations CFG</h2>
+            </div>
+          </div>
+
+          <div class="grammar-box">
+            <span class="box-label">Formal Declaration Grammar:</span>
+            <code>
+              &lt;Decl&gt; &rarr; &lt;Type&gt; &lt;VarList&gt; ;<br>
+              &lt;Type&gt; &rarr; int | float | char<br>
+              &lt;VarList&gt; &rarr; id | id , &lt;VarList&gt;
+            </code>
+          </div>
+
+          <!-- Interactive Input Tester -->
+          <div class="tester-input-group">
+            <label for="decl-input">Enter a declaration to validate against the grammar:</label>
+            <div class="input-with-button">
+              <input type="text" id="decl-input" value="float y, z;" placeholder="e.g., int x; or char a, b, c;">
+              <button class="btn btn-primary" id="btn-validate-decl">Validate Syntax</button>
+            </div>
+          </div>
+
+          <!-- Quick Samples -->
+          <div class="preset-buttons">
+            <span class="preset-label">Test Candidates:</span>
+            <button class="btn btn-outline" data-decl="int x;">int x; (Valid)</button>
+            <button class="btn btn-outline" data-decl="float y, z;">float y, z; (Valid)</button>
+            <button class="btn btn-outline" data-decl="char a, b, c;">char a, b, c; (Valid)</button>
+            <button class="btn btn-outline" data-decl="int x">int x (Missing semicolon)</button>
+            <button class="btn btn-outline" data-decl="double w;">double w; (Invalid type)</button>
+            <button class="btn btn-outline" data-decl="float y, ;">float y, ; (Trailing comma)</button>
+          </div>
+
+          <!-- Validation Result Banner -->
+          <div class="validation-banner" id="decl-result-banner">
+            <div class="result-badge-container">
+              <span class="badge-result valid" id="decl-badge">VALID SYNTAX</span>
+            </div>
+            <div class="result-details" id="decl-result-details">
+              Statement conforms to &lt;Type&gt; &lt;VarList&gt; ; with type <code>float</code> and variables <code>y, z</code>.
+            </div>
+          </div>
+
+          <!-- Derivation Tree Simulation -->
+          <div class="history-container">
+            <h3>Step-by-Step Derivation Breakdown</h3>
+            <ol class="history-list" id="decl-derivation-list">
+              <!-- Rendered via JS -->
+            </ol>
+          </div>
+        </div>
+
+        <aside class="panel-card side-info-card">
+          <div class="info-block">
+            <h3>Grammar Characteristics</h3>
+            <ul class="bullet-notes">
+              <li><strong>Mandatory Semicolon:</strong> The terminal <code>;</code> is locked at the end of every <code>&lt;Decl&gt;</code>. Omitting it causes an immediate syntax error.</li>
+              <li><strong>Allowed Types:</strong> Strictly limited to <code>int</code>, <code>float</code>, and <code>char</code>. Types like <code>double</code> or <code>string</code> are rejected unless added to the grammar rule.</li>
+              <li><strong>Comma Recursion:</strong> <code>&lt;VarList&gt; &rarr; id , &lt;VarList&gt;</code> ensures that every comma is immediately followed by another variable name.</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- TAB 4: COMBINATORIAL SIZING -->
+    <section class="tab-pane" id="pane-combinatorics">
+      <div class="panel-layout">
+        <div class="panel-card main-simulation-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="section-tag">Interactive Mathematical Proof</span>
+              <h2>Combinatorial Language Sizing Calculator</h2>
+            </div>
+          </div>
+
+          <div class="grammar-box">
+            <span class="box-label">Grammar Hierarchy:</span>
+            <code>
+              &lt;S&gt; &rarr; &lt;NP&gt; &lt;VP&gt; (Sentence = Noun Phrase + Verb Phrase)<br>
+              &lt;NP&gt; &rarr; &lt;Det&gt; &lt;N&gt; (Noun Phrase = Determiner + Noun)<br>
+              &lt;VP&gt; &rarr; &lt;V&gt; &lt;NP&gt; (Verb Phrase = Verb + Noun Phrase)
+            </code>
+          </div>
+
+          <!-- Interactive Sliders / Inputs -->
+          <div class="inputs-grid">
+            <div class="input-card">
+              <label for="num-det">Determiners |&lang;Det&rang;|:</label>
+              <div class="input-slider-row">
+                <input type="number" id="num-det" min="1" max="10" value="2">
+                <span class="example-text">e.g. "the", "a"</span>
+              </div>
+            </div>
+            <div class="input-card">
+              <label for="num-n">Nouns |&lang;N&rang;|:</label>
+              <div class="input-slider-row">
+                <input type="number" id="num-n" min="1" max="10" value="2">
+                <span class="example-text">e.g. "dog", "cat"</span>
+              </div>
+            </div>
+            <div class="input-card">
+              <label for="num-v">Verbs |&lang;V&rang;|:</label>
+              <div class="input-slider-row">
+                <input type="number" id="num-v" min="1" max="10" value="2">
+                <span class="example-text">e.g. "chased", "saw"</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step-by-Step Calculation Canvas -->
+          <div class="math-proof-box">
+            <h3>Step-by-Step Calculation (Multiplication Rule)</h3>
+            
+            <div class="calc-step">
+              <div class="step-badge">Step 1</div>
+              <div class="step-math">
+                <span>Noun Phrase Combinations:</span>
+                <strong>|&lang;NP&rang;| = |&lang;Det&rang;| &times; |&lang;N&rang;| = <span id="math-det-val">2</span> &times; <span id="math-n-val">2</span> = <span class="highlight-result" id="res-np">4</span></strong>
+              </div>
+            </div>
+
+            <div class="calc-step">
+              <div class="step-badge">Step 2</div>
+              <div class="step-math">
+                <span>Verb Phrase Combinations:</span>
+                <strong>|&lang;VP&rang;| = |&lang;V&rang;| &times; |&lang;NP&rang;| = <span id="math-v-val">2</span> &times; <span id="math-np-val">4</span> = <span class="highlight-result" id="res-vp">8</span></strong>
+              </div>
+            </div>
+
+            <div class="calc-step final-step">
+              <div class="step-badge">Step 3</div>
+              <div class="step-math">
+                <span>Total Valid Sentences:</span>
+                <strong class="mega-result">|&lang;S&rang;| = |&lang;NP&rang;| &times; |&lang;VP&rang;| = <span id="math-final-np">4</span> &times; <span id="math-final-vp">8</span> = <span class="highlight-total" id="res-total-sentences">32 Sentences</span></strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Generated Samples Preview -->
+          <div class="history-container">
+            <h3>Generated Sample Sentences (First 16 Combinations)</h3>
+            <div class="sentence-sample-grid" id="sample-sentences-container">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+        </div>
+
+        <aside class="panel-card side-info-card">
+          <div class="info-block">
+            <h3>Why Multiplication Rule Applies</h3>
+            <p class="body-text">Under the <strong>Fundamental Counting Principle</strong>, when an event consists of $k$ independent sequential choices, the total outcomes is the product of choices at each stage:</p>
+            <div class="formula-pill">Total = Options<sub>1</sub> &times; Options<sub>2</sub> &times; ...</div>
+            <p class="body-text">Because any subject noun phrase can be matched with any predicate verb phrase, the sets multiply directly.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- TAB 5: PRACTICE QUIZ -->
+    <section class="tab-pane" id="pane-quiz">
+      <div class="panel-layout">
+        <div class="panel-card main-simulation-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="section-tag">Interactive Exam Simulator</span>
+              <h2>Grammars & CFG Practice Quiz</h2>
+            </div>
+            <div class="quiz-score-badge" id="quiz-score-display">Score: 0 / 10</div>
+          </div>
+
+          <div class="quiz-container" id="quiz-items-container">
+            <!-- Populated via JS with 10 questions -->
+          </div>
+        </div>
+
+        <aside class="panel-card side-info-card">
+          <div class="info-block">
+            <h3>Exam Tip: Maximizing Points</h3>
+            <p class="body-text">On formal grammar questions:</p>
+            <ul class="bullet-notes">
+              <li>Always label each step with the exact rule you used.</li>
+              <li>Underline or highlight the leftmost non-terminal before expanding it.</li>
+              <li>Show the multiplication steps cleanly: <code>|NP| = 4</code>, <code>|VP| = 8</code>, <code>|S| = 32</code>.</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-content">
+      <p>Prepared for UST-CICS Prelim Review &bull; CS311 Programming Languages &bull; Prof. Bernard C. Fabro, PCpE</p>
+      <p class="footer-sub">Interactive Simulator &bull; Single-page static web application</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
